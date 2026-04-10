@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  casosino:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - NODE_ENV=production
+    restart: unless-stopped
+    # Для dev режима раскомментируйте и измените on:
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
+    expose:
+      - "3000"
+
+# Опционально: добавить nginx reverse proxy
+# services:
+#   casosino:
+#     ...
+#   
+#   nginx:
+#     image: nginx:alpine
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#     depends_on:
+#       - casosino
+#     restart: unless-stopped

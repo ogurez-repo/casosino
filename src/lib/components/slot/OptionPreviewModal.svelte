@@ -4,20 +4,42 @@
   let {
     option,
     onClose,
+    isSelected = false,
+    onToggleSelected,
   } = $props<{
     option: ActivityOption | null;
     onClose: () => void;
+    isSelected?: boolean;
+    onToggleSelected?: (option: ActivityOption) => void;
   }>();
+
+  const openMaps = (url?: string) => {
+    if (url) {
+      window.open(url, "_blank");
+    }
+  };
+
+  const handleModalClick = (e: MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      onClose();
+    }
+  };
 </script>
 
 {#if option}
-  <div class="modal-backdrop" onclick={onClose}>
+  <div class="modal-backdrop" onclick={onClose} role="presentation">
     <div
       class="modal-shell"
       role="dialog"
       aria-modal="true"
       aria-label={`Вариант: ${option.title}`}
-      onclick|stopPropagation
+      onclick={handleModalClick}
+      onkeydown={handleKeyDown}
+      tabindex="0"
     >
       <article class="result modal-result">
         <div class="result-icon">{option.icon}</div>
@@ -28,9 +50,28 @@
         </div>
       </article>
 
-      <button type="button" class="close-button" onclick={onClose}>
-        Закрыть
-      </button>
+      <div class="button-group">
+        <button
+          type="button"
+          class="select-button"
+          class:selected={isSelected}
+          onclick={() => onToggleSelected?.(option!)}
+        >
+          {isSelected ? "☑️" : "☐"} {isSelected ? "В выборе" : "Добавить"}
+        </button>
+        {#if option.mapsUrl}
+          <button
+            type="button"
+            class="maps-button"
+            onclick={() => openMaps(option.mapsUrl)}
+          >
+            🗺️ На Яндекс Карты
+          </button>
+        {/if}
+        <button type="button" class="close-button" onclick={onClose}>
+          Закрыть
+        </button>
+      </div>
     </div>
   </div>
 {/if}
@@ -52,7 +93,84 @@
   }
 
   .modal-result {
-    margin: 0;
+    margin: 0 0 0.9rem 0;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 0.7rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .maps-button {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1rem;
+    border: 4px solid #14100a;
+    background:
+      linear-gradient(180deg, #5a9fdb 0%, #2e5fa8 100%),
+      repeating-linear-gradient(
+        90deg,
+        rgb(255 255 255 / 10%) 0 8px,
+        rgb(0 0 0 / 10%) 8px 16px
+      );
+    box-shadow: 0 5px 0 #1a3d6f;
+    color: #fff;
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.58rem;
+    cursor: pointer;
+    transition: filter 120ms ease;
+  }
+
+  .maps-button:hover {
+    filter: saturate(1.08) brightness(1.05);
+  }
+
+  .maps-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 0 #1a3d6f;
+  }
+
+  .select-button {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1rem;
+    border: 4px solid #14100a;
+    background:
+      linear-gradient(180deg, #7a6b47 0%, #4d402a 100%),
+      repeating-linear-gradient(
+        90deg,
+        rgb(255 255 255 / 10%) 0 8px,
+        rgb(0 0 0 / 10%) 8px 16px
+      );
+    box-shadow: 0 5px 0 #3a2f1f;
+    color: #f4f8e8;
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.58rem;
+    cursor: pointer;
+    transition: all 120ms ease;
+  }
+
+  .select-button:hover {
+    filter: saturate(1.08) brightness(1.05);
+  }
+
+  .select-button.selected {
+    background:
+      linear-gradient(180deg, #48a866 0%, #2d6a42 100%),
+      repeating-linear-gradient(
+        90deg,
+        rgb(255 255 255 / 10%) 0 8px,
+        rgb(0 0 0 / 10%) 8px 16px
+      );
+    box-shadow: 0 5px 0 #1b4428;
+  }
+
+  .select-button:active {
+    transform: translateY(1px);
   }
 
   .result {

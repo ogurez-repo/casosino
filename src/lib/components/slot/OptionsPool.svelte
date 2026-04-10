@@ -5,11 +5,17 @@
     kinds,
     options,
     onOptionSelect,
+    selectedItems = [],
   } = $props<{
     kinds: ActivityKind[];
     options: ActivityOption[];
     onOptionSelect: (option: ActivityOption) => void;
+    selectedItems?: ActivityOption[];
   }>();
+
+  const isSelected = (option: ActivityOption) => {
+    return selectedItems.some((item) => item.title === option.title);
+  };
 </script>
 
 <h2>Возможные выпадения</h2>
@@ -20,8 +26,13 @@
       <ul>
         {#each options.filter((option: ActivityOption) => option.kind === kind) as option}
           <li>
-            <button type="button" class="pool-option" onclick={() => onOptionSelect(option)}>
-              {option.icon} {option.title}
+            <button
+              type="button"
+              class="pool-option"
+              class:selected={isSelected(option)}
+              onclick={() => onOptionSelect(option)}
+            >
+              {isSelected(option) ? "✓" : "•"} {option.icon} {option.title}
             </button>
           </li>
         {/each}
@@ -105,6 +116,16 @@
     outline: none;
     border-color: #f5d87f;
     background: rgb(245 216 127 / 16%);
+  }
+
+  .pool-option.selected {
+    border-color: rgb(169 223 142 / 100%);
+    background: rgb(169 223 142 / 22%);
+    color: #d4e9bf;
+  }
+
+  .pool-option.selected:hover {
+    background: rgb(169 223 142 / 32%);
   }
 
   @media (max-width: 900px) {
