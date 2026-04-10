@@ -2,10 +2,10 @@ node_modules
 .svelte-kit
 build
 dist
-.env.local
-.env
+.env*
 .git
 .gitignore
-README.md
+*.md
 *.log
 .DS_Store
+docker-compose*.yml

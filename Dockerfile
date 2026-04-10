@@ -1,42 +1,34 @@
-# Используем официальный Node.js образ с bun
-FROM oven/bun:1.0-slim as builder
+# ---- Build stage ----
+FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
-# Копируем package.json и lock файл
 COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
-# Устанавливаем зависимости
-RUN bun install --production
-
-# Копируем исходный код
 COPY . .
 
-# Собираем приложение
+# $env/static/private values are inlined at build time by Vite
+ARG TELEGRAM_BOT_TOKEN
+ARG TELEGRAM_CHAT_ID
+
 RUN bun run build
 
-# Production образ
-FROM oven/bun:1.0-slim
+# ---- Run stage ----
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
-# Устанавливаем дополнительные команды для системы
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
-
-# Копируем node_modules и build из builder stage
-COPY --from=builder /app/node_modules ./node_modules
+# No runtime deps needed — all packages are devDependencies, build is self-contained
 COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json ./package.json
 
-# Копируем .env файл если нужен (опционально)
-# COPY .env .env
-
-# Expose порт
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/ || exit 1
+ENV HOST=0.0.0.0
+ENV PORT=3000
+ENV NODE_ENV=production
 
-# Стартовая команда
-CMD ["bun", "run", "preview"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD wget -qO- http://localhost:3000/ || exit 1
+
+CMD ["bun", "build/index.js"]
