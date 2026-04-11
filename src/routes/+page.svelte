@@ -4,8 +4,14 @@
   import SlotMachine from "$lib/components/slot/SlotMachine.svelte";
   import SpinResult from "$lib/components/slot/SpinResult.svelte";
   import OptionsPool from "$lib/components/slot/OptionsPool.svelte";
+<<<<<<< ours
+  import OptionPreviewModal from "$lib/components/slot/OptionPreviewModal.svelte";
+
+||||||| ancestor
+=======
   import OptionPreviewModal from "$lib/components/slot/OptionPreviewModal.svelte";
   import SubmitReportModal from "$lib/components/slot/SubmitReportModal.svelte";
+>>>>>>> theirs
   const symbols = options.map((option) => `${option.icon} ${option.title}`);
   const missSymbol = "🪨 Пусто";
   const dropChance = 0.25;
@@ -15,9 +21,14 @@
   let reelSymbols = $state([symbols[0], symbols[1], symbols[2]]);
   let result = $state<ActivityOption | null>(null);
   let lastSpinMissed = $state(false);
+<<<<<<< ours
+  let selectedOption = $state<ActivityOption | null>(null);
+||||||| ancestor
+=======
   let selectedOption = $state<ActivityOption | null>(null);
   let selectedItems = $state<ActivityOption[]>([]);
   let isSubmitModalOpen = $state(false);
+>>>>>>> theirs
 
   let spinner: ReturnType<typeof setInterval> | null = null;
 
@@ -39,6 +50,14 @@
   onDestroy(() => {
     stopSpinner();
   });
+
+  const openOptionPreview = (option: ActivityOption) => {
+    selectedOption = option;
+  };
+
+  const closeOptionPreview = () => {
+    selectedOption = null;
+  };
 
   const pullHandle = async () => {
     if (isSpinning) {
@@ -226,12 +245,22 @@
   {/if}
 
   <section class="pool-section">
+<<<<<<< ours
+    <OptionsPool
+      kinds={activityKinds}
+      {options}
+      onOptionSelect={openOptionPreview}
+    />
+||||||| ancestor
+    <OptionsPool kinds={activityKinds} {options} />
+=======
     <OptionsPool
       kinds={activityKinds}
       {options}
       onOptionSelect={handleOptionSelect}
       {selectedItems}
     />
+>>>>>>> theirs
   </section>
 
   <OptionPreviewModal
@@ -248,6 +277,8 @@
     onSubmit={handleSubmitReport}
   />
 </main>
+
+<OptionPreviewModal option={selectedOption} onClose={closeOptionPreview} />
 
 <style>
   :global(body) {

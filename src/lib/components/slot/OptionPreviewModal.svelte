@@ -31,15 +31,34 @@
 </script>
 
 {#if option}
+<<<<<<< ours
+  <div class="modal-layer">
+    <button
+      type="button"
+      class="modal-backdrop"
+      aria-label="Закрыть окно"
+      onclick={onClose}
+    ></button>
+
+||||||| ancestor
+  <div class="modal-backdrop" onclick={onClose}>
+=======
   <div class="modal-backdrop" onclick={onClose} role="presentation">
+>>>>>>> theirs
     <div
       class="modal-shell"
       role="dialog"
       aria-modal="true"
       aria-label={`Вариант: ${option.title}`}
+<<<<<<< ours
+      tabindex="-1"
+||||||| ancestor
+      onclick|stopPropagation
+=======
       onclick={handleModalClick}
       onkeydown={handleKeyDown}
       tabindex="0"
+>>>>>>> theirs
     >
       <article class="result modal-result">
         <div class="result-icon">{option.icon}</div>
@@ -77,18 +96,27 @@
 {/if}
 
 <style>
-  .modal-backdrop {
+  .modal-layer {
     position: fixed;
     inset: 0;
     z-index: 20;
     display: grid;
     place-items: center;
     padding: 1rem;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
     background: rgb(14 12 10 / 62%);
     backdrop-filter: blur(2px);
+    cursor: pointer;
   }
 
   .modal-shell {
+    position: relative;
+    z-index: 1;
     width: min(720px, 100%);
   }
 
